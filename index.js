@@ -7,6 +7,15 @@ const containsPath = require( 'contains-path' );
 const { reduce, zipObject, uniq, map, isPlainObject, find, assign } = require( 'lodash' );
 
 module.exports = class ResolveEntryModulesPlugin {
+		/**
+	 * Get options from webpack and saves to state.
+	 *
+	 * @param  {options}      filter Filter string hash (to filter entries)
+	 */
+	constructor(filter) {
+    this.filter = filter;
+  }
+
 	/**
 	 * Given an entry configuration, returns entries in a normalized object form.
 	 *
@@ -59,7 +68,8 @@ module.exports = class ResolveEntryModulesPlugin {
 
 	apply( compiler ) {
 		const { entry, context } = compiler.options;
-		const entryRoots = ResolveEntryModulesPlugin.getEntryRoots( entry, context );
+		const entryRoots = ResolveEntryModulesPlugin.getEntryRoots( entry, context )
+											 	.filter(entryRoot => entryRoot.includes(this.filter) )
 
 		compiler.plugin( 'after-resolvers', () => {
 			compiler.resolvers.normal.apply( {
